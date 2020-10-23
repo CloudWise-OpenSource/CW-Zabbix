@@ -49,4 +49,7 @@ int	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, ch
 /* elastic hist */
 int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
 
+/* clickhouse hist */
+int	zbx_history_clickhouse_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
+
 #endif
