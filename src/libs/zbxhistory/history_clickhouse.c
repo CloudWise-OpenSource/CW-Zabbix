@@ -27,7 +27,7 @@
 #include "history.h"
 
 /* curl_multi_wait() is supported starting with version 7.28.0 (0x071c00) */
-#if defined(HAVE_LIBCURL) && LIBCURL_VERSION_NUM >= 0x071c00 || 1
+#if defined(HAVE_LIBCURL) && LIBCURL_VERSION_NUM >= 0x071c00
 size_t	DCconfig_get_itemids_by_valuetype( int value_type, zbx_vector_uint64_t *vector_itemids);
 int	zbx_vc_simple_add(zbx_uint64_t itemids, zbx_history_record_t *record);
 
@@ -424,14 +424,14 @@ static int	clickhouse_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid,
 
         if (SUCCEED == zbx_json_brackets_open(p, &jp_row)) {
 			
-            if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "clock", &clck, &clck_alloc) &&
-                SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "value", &value, &value_alloc) &&
-                SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "value_dbl", &value_dbl, &value_dbl_alloc) &&
-                SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "value_str", &value_str, &value_str_alloc)) 
+            if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "clock", &clck, &clck_alloc, NULL) &&
+                SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "value", &value, &value_alloc, NULL) &&
+                SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "value_dbl", &value_dbl, &value_dbl_alloc, NULL) &&
+                SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "value_str", &value_str, &value_str_alloc, NULL)) 
             {
                
 			   	if ( 0 == CONFIG_CLICKHOUSE_DISABLE_NS_VALUE &&
-					 SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "ns", &ns, &ns_alloc) ) {
+					 SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "ns", &ns, &ns_alloc, NULL) ) {
 							hr.timestamp.ns = atoi(ns); 
 				} else hr.timestamp.ns = 0;
 
@@ -696,11 +696,11 @@ static int zbx_history_add_vc(char* url, int value_type, char *query) {
 			
 			if (SUCCEED == zbx_json_brackets_open(p, &jp_row)) {
 					
-            	if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "itemid", &itemid_str, &itemid_alloc) &&
-					SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "clock", &clck, &clck_alloc) &&
-           			SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "value", &value, &value_alloc) &&
-                	SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "value_dbl", &value_dbl, &value_dbl_alloc) &&
-                	SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "value_str", &value_str, &value_str_alloc)) {
+            	if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "itemid", &itemid_str, &itemid_alloc, NULL) &&
+					SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "clock", &clck, &clck_alloc, NULL) &&
+           			SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "value", &value, &value_alloc, NULL) &&
+                	SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "value_dbl", &value_dbl, &value_dbl_alloc, NULL) &&
+                	SUCCEED == zbx_json_value_by_name_dyn(&jp_row, "value_str", &value_str, &value_str_alloc, NULL)) {
                
 			   		hr.timestamp.sec = atoi(clck);
 					itemid=atoi(itemid_str);

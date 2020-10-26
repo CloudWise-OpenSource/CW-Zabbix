@@ -515,6 +515,8 @@ typedef struct
 	unsigned char	flags;		/* see ZBX_DC_FLAG_* */
 	unsigned char	state;
 	int		ttl;		/* time-to-live of the history value */
+	char *host_name; /*hostname to log to history */
+	char *item_key; /* name of metric h*/
 }
 ZBX_DC_HISTORY;
 
