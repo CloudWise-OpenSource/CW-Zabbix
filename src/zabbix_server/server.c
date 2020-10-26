@@ -817,7 +817,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"HistoryStorageTypes",		&CONFIG_HISTORY_STORAGE_OPTS,		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"HistoryStorageURL",		&CONFIG_HISTORY_STORAGE_NAME,		TYPE_STRING,
+		{"HistoryStorageName",		&CONFIG_HISTORY_STORAGE_NAME,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"HistoryStorageDateIndex",	&CONFIG_HISTORY_STORAGE_PIPELINES,	TYPE_INT,
 			PARM_OPT,	0,			1},

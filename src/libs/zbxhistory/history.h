@@ -31,7 +31,7 @@ typedef int (*zbx_history_get_values_func_t)(struct zbx_history_iface *hist, zbx
 		int count, int end, zbx_vector_history_record_t *values);
 typedef int (*zbx_history_flush_func_t)(struct zbx_history_iface *hist);
 typedef int(*zbx_history_get_agg_values_func_t)(struct zbx_history_iface *hist, zbx_uint64_t itemid, int start, int end, int aggregates, char **buffer);
-typedef int(*zbx_history_preload_values_func_t)(struct zbx_history_iface *hist);ÍÍ
+typedef int(*zbx_history_preload_values_func_t)(struct zbx_history_iface *hist);
 
 struct zbx_history_iface
 {
