@@ -819,6 +819,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"HistoryStorageName",		&CONFIG_HISTORY_STORAGE_NAME,		TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"HistoryStorageDBName",		&CONFIG_HISTORY_STORAGE_DB_NAME,		TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{"HistoryStorageDateIndex",	&CONFIG_HISTORY_STORAGE_PIPELINES,	TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"ExportDir",			&CONFIG_EXPORT_DIR,			TYPE_STRING,
