@@ -2815,6 +2815,52 @@ void	zbx_vc_disable(void)
 	vc_state = ZBX_VC_DISABLED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vc_simple_add                                                *
+ *                                                                            *
+ * Purpose: adds item values to the history and value cache                   *
+ *                                                                            *
+ * Parameters: history - [IN] item history values                             *
+ *                                                                            *
+ * Return value: SUCCEED - the values were added successfully                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_vc_simple_add(zbx_uint64_t itemid, zbx_history_record_t *record)
+{
+	zbx_vc_item_t		*item;
+	time_t			expire_timestamp;
+
+	if (ZBX_VC_DISABLED == vc_state)
+		return FAIL;
+
+	expire_timestamp = time(NULL) - ZBX_VC_ITEM_EXPIRE_PERIOD;
+
+	vc_try_lock();
+
+	if (NULL != (item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &itemid)))
+	{
+		if (0 == (item->state & ZBX_ITEM_STATE_REMOVE_PENDING))
+		{
+			vc_item_addref(item);
+
+			if ( item->last_accessed < expire_timestamp ||
+					FAIL == vch_item_add_value_at_head(item, record))
+			{
+				item->state |= ZBX_ITEM_STATE_REMOVE_PENDING;
+			}
+
+			vc_item_release(item);
+			
+		}
+	}
+
+	vc_try_unlock();
+
+	return SUCCEED;
+}
+
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxdbcache/valuecache_test.c"
 #endif

@@ -12706,6 +12706,31 @@ const char	*zbx_dc_get_instanceid(void)
 	return config->config->instanceid;
 }
 
+size_t	DCconfig_get_itemids_by_valuetype( int value_type, zbx_vector_uint64_t *vector_itemids)
+{
+	size_t			count=0;
+	const ZBX_DC_ITEM	*item;
+	
+
+	zbx_hashset_iter_t iter;
+	
+	RDLOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->items,&iter);
+
+	while (NULL != (item = zbx_hashset_iter_next(&iter))) {
+		if (item->value_type == value_type && NULL != item->triggers) {
+		//if (item->value_type == value_type ) {
+			zbx_vector_uint64_append(vector_itemids,item->itemid);
+			count ++;
+		}
+	}
+
+	UNLOCK_CACHE;
+	return count;
+	
+}
+
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
 #endif

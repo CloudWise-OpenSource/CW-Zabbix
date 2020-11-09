@@ -259,12 +259,20 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 			}
 
+            global $HISTORY;
+
+            if ($HISTORY['storagetype'] == 'clickhouse' && !isset($HISTORY['disable_trends'])) {
+                $item['trends']=1;
+            }
+
 			$item['source'] = ($item['trends'] == 0 || (($time_now - $item['history']) < $this->from_time
 					&& ($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))
 				? 'history'
 				: 'trends';
 
-			$this->items[$i]['source'] = $item['source'];
+            if (isset($HISTORY['disable_trends']) ) $item['source']='history';
+
+            $this->items[$i]['source'] = $item['source'];
 
 			$items[] = $item;
 		}
@@ -273,7 +281,7 @@ class CLineGraphDraw extends CGraphDraw {
 			$this->sizeX
 		);
 
-		foreach ($items as $item) {
+        foreach ($items as $item) {
 			$data = [
 				'count' => [],
 				'min' => [],
@@ -2071,6 +2079,9 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->calcDimentions();
 
 		$this->selectData();
+		if (hasErrorMesssages()) {
+			show_messages();
+		}
 
 		$this->calcVerticalScale();
 		$this->calcPercentile();

@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.2');
-define('ZABBIX_API_VERSION',	'5.0.2');
+define('ZABBIX_VERSION',		'5.0.4');
+define('ZABBIX_API_VERSION',	'5.0.4');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
 define('ZABBIX_DB_VERSION',		5000000);
 
@@ -70,6 +70,7 @@ define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without s
 // by default set to 86400 seconds (24 hours)
 define('ZBX_HISTORY_PERIOD', 86400);
 
+define('ZBX_HISTORY_SOURCE_CLICKHOUSE',	'clickhouse');
 define('ZBX_HISTORY_SOURCE_ELASTIC',	'elastic');
 define('ZBX_HISTORY_SOURCE_SQL',		'sql');
 
@@ -78,7 +79,7 @@ define('ELASTICSEARCH_RESPONSE_AGGREGATION',	1);
 define('ELASTICSEARCH_RESPONSE_DOCUMENTS',		2);
 
 define('ZBX_FONTPATH',				realpath('assets/fonts')); // where to search for font (GD > 2.0.18)
-define('ZBX_GRAPH_FONT_NAME',		'DejaVuSans'); // font file name
+define('ZBX_GRAPH_FONT_NAME',		'graphfont'); // font file name
 define('ZBX_GRAPH_LEGEND_HEIGHT',	120); // when graph height is less then this value, some legend will not show up
 
 define('GRAPH_YAXIS_SIDE_DEFAULT', 0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
@@ -119,7 +120,7 @@ define('TRIGGERS_OPTION_RECENT_PROBLEM',	1);
 define('TRIGGERS_OPTION_ALL',				2);
 define('TRIGGERS_OPTION_IN_PROBLEM',		3);
 
-define('ZBX_FONT_NAME', 'DejaVuSans');
+define('ZBX_FONT_NAME', 'graphfont');
 
 define('ZBX_AUTH_INTERNAL',	0);
 define('ZBX_AUTH_LDAP',		1);
@@ -145,10 +146,14 @@ define('ZBX_DB_MAX_ID', '9223372036854775807');
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
 
-// Default db and field character set
+// Default db and field character set (MYSQL & POSTGRESQL)
 define('ZBX_DB_DEFAULT_CHARSET', 'UTF8');
 define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
+
+// Default db defines for Oracle DB
 define('ORACLE_MAX_STRING_SIZE', 4000);
+define('ORACLE_UTF8_CHARSET', 'AL32UTF8');
+define('ORACLE_CESU8_CHARSET', 'UTF8');
 
 define('ZBX_SHOW_TECHNICAL_ERRORS', false);
 
@@ -1256,7 +1261,7 @@ define('IPMI_PRIVILEGE_OEM',		5);
 define('ZBX_HAVE_IPV6', true);
 define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 
-define('ZBX_SOCKET_TIMEOUT',			3);		// Socket timeout limit.
+define('ZBX_SOCKET_TIMEOUT',			10);		// Socket timeout limit.
 define('ZBX_CONNECT_TIMEOUT',			3);		// Zabbix server connect timeout limit.
 define('ZBX_MEDIA_TYPE_TEST_TIMEOUT',	65);	// Timeout limit set for media type test.
 define('ZBX_SCRIPT_TIMEOUT',			60);	// Timeout limit set for scripts.
@@ -1373,7 +1378,8 @@ define('ZBX_MAX_PORT_NUMBER', 65535);
 
 define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
 define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
-define('ZBX_MACRO_SECRET_MASK', '******'); // Placeholder for masked macro value.
+
+define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 
 // Layout
 define('ZBX_LAYOUT_NORMAL',     0);
@@ -1675,6 +1681,7 @@ define('ZBX_STYLE_HEADER_CONTROLS', 'header-controls');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
+define('ZBX_STYLE_HINTBOX_WRAP', 'hintbox-wrap');
 define('ZBX_STYLE_ICON_ACKN', 'icon-ackn');
 define('ZBX_STYLE_ICON_CAL', 'icon-cal');
 define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');

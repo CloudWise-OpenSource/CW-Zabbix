@@ -24,7 +24,7 @@
  */
 class CHistory extends CApiService {
 
-	protected $tableName;
+    protected $tableName = 'history';
 	protected $tableAlias = 'h';
 	protected $sortColumns = ['itemid', 'clock'];
 
@@ -171,13 +171,16 @@ class CHistory extends CApiService {
 		switch (CHistoryManager::getDataSourceType($options['history'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
 				return $this->getFromElasticsearch($options);
-
-			default:
+                break;
+            case ZBX_HISTORY_SOURCE_CLICKHOUSE:
+                return $this->getFromClickHouse($options);
+                break;
+            default:
 				return $this->getFromSql($options);
 		}
 	}
 
-	/**
+    /**
 	 * SQL specific implementation of get.
 	 *
 	 * @see CHistory::get
@@ -222,7 +225,7 @@ class CHistory extends CApiService {
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
 
-		$db_res = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
+		$db_res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		while ($data = DBfetch($db_res)) {
 			if ($options['countOutput']) {
@@ -235,6 +238,144 @@ class CHistory extends CApiService {
 
 		return $result;
 	}
+
+    /**
+     * Clickhouse specific implementation of get.
+     *
+     * @see CHistory::get
+     */
+    private function getFromClickHouse($options) {
+        global $HISTORY, $ClickHouseDisableNanoseconds;
+
+        $result = [];
+        $sql_parts = [
+            'select'	=> ['history' => 'h.itemid'],
+            'from'		=> [],
+            'where'		=> [],
+            'group'		=> [],
+            'order'		=> [],
+            'limit'		=> null
+        ];
+
+
+        $value_col='value';
+
+        if ($options['history']==ITEM_VALUE_TYPE_STR ||
+            $options['history']==ITEM_VALUE_TYPE_LOG ||
+            $options['history']==ITEM_VALUE_TYPE_TEXT) {
+            $value_col='value_str';
+        } elseif ($options['history']==ITEM_VALUE_TYPE_FLOAT) {
+            $value_col='value_dbl';
+        }
+
+        switch ($options['history']) {
+            case ITEM_VALUE_TYPE_STR:
+            case ITEM_VALUE_TYPE_LOG:
+            case ITEM_VALUE_TYPE_TEXT:
+                $value_col = 'value_str';
+                break;
+            case ITEM_VALUE_TYPE_FLOAT:
+                $value_col = 'value_dbl';
+                break;
+        }
+
+        $table_name = $HISTORY['dbname'].'.history';
+
+        $sql_parts['from']['history'] = $table_name.' h';
+
+        // itemids
+        if ($options['itemids'] !== null) {
+             $key = array_keys($options['itemids'])[0];
+             $sql_parts['where']['itemid'] = "h.itemid =". $options['itemids'][$key];
+
+            //$sql_parts['where']['itemid'] = "h.itemid =". $options['itemids'][0];
+        }
+
+        // time_from
+        if ($options['time_from'] !== null) {
+            $sql_parts['where']['clock_from'] = 'h.clock>='.zbx_dbstr($options['time_from']);
+        }
+
+        // time_till
+        if ($options['time_till'] !== null) {
+            $sql_parts['where']['clock_till'] = 'h.clock<='.zbx_dbstr($options['time_till']);
+        }
+
+        // filter
+        if (is_array($options['filter'])) {
+            $this->dbFilter($sql_parts['from']['history'], $options, $sql_parts);
+        }
+
+        // search
+        if (is_array($options['search'])) {
+            zbx_db_search($sql_parts['from']['history'], $options, $sql_parts);
+        }
+
+        // output
+        if ($options['output'] == API_OUTPUT_EXTEND) {
+            unset($sql_parts['select']['clock']);
+            $sql_parts['select']['history'] = 'h.*';
+        }
+
+        // countOutput
+        if ($options['countOutput']) {
+            $options['sortfield'] = '';
+            $sql_parts['select'] = ['count(DISTINCT h.hostid) as rowscount'];
+
+            // groupCount
+            if ($options['groupCount']) {
+                foreach ($sql_parts['group'] as $key => $fields) {
+                    $sql_parts['select'][$key] = $fields;
+                }
+            }
+        }
+
+        // sorting
+        $sql_parts = $this->applyQuerySortOptions($table_name, $this->tableAlias(), $options, $sql_parts);
+
+        // limit
+        if (zbx_ctype_digit($options['limit']) && $options['limit']) {
+            $sql_parts['limit'] = $options['limit'];
+        }
+
+        $sql_parts['select'] = array_unique($sql_parts['select']);
+        $sql_parts['from'] = array_unique($sql_parts['from']);
+        $sql_parts['where'] = array_unique($sql_parts['where']);
+        $sql_parts['order'] = array_unique($sql_parts['order']);
+
+        $sql_select = '';
+        $sql_from = '';
+        $sql_order = '';
+
+        if ($sql_parts['select']) {
+            $sql_select .= implode(',', $sql_parts['select']);
+        }
+
+        if ($sql_parts['from']) {
+            $sql_from .= implode(',', $sql_parts['from']);
+        }
+
+        $sql_where = $sql_parts['where'] ? ' WHERE '.implode(' AND ', $sql_parts['where']) : '';
+
+        if ($sql_parts['order']) {
+            $sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+        }
+
+        $sql_limit = $sql_parts['limit'];
+        $sql = "SELECT itemid, toInt32(clock),". ($ClickHouseDisableNanoseconds == 1 ? "0 AS ns," : "ns,") ."$value_col".
+            ' FROM '.$sql_from.
+            $sql_where.
+            $sql_order;
+
+
+//		var_dump($sql);
+        $values = CClickHouseHelper::query($sql,1,array('itemid','clock','ns', 'value'));
+
+
+//		error("Will exec sql $sql");
+
+        return $values;
+    }
 
 	/**
 	 * Elasticsearch specific implementation of get.

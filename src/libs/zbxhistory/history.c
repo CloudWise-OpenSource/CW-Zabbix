@@ -29,6 +29,7 @@ ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 
 extern char	*CONFIG_HISTORY_STORAGE_URL;
 extern char	*CONFIG_HISTORY_STORAGE_OPTS;
+extern char *CONFIG_HISTORY_STORAGE_NAME;
 
 zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_MAX];
 
@@ -53,10 +54,13 @@ int	zbx_history_init(char **error)
 
 	for (i = 0; i < ITEM_VALUE_TYPE_MAX; i++)
 	{
-		if (NULL == CONFIG_HISTORY_STORAGE_URL || NULL == strstr(CONFIG_HISTORY_STORAGE_OPTS, opts[i]))
-			ret = zbx_history_sql_init(&history_ifaces[i], i, error);
+		if (NULL != CONFIG_HISTORY_STORAGE_URL && NULL != strstr(CONFIG_HISTORY_STORAGE_OPTS, opts[i]))
+			if ( NULL != strstr(CONFIG_HISTORY_STORAGE_NAME, "clickhouse")) 
+		    	ret = zbx_history_clickhouse_init(&history_ifaces[i], i, error);
+			else
+				ret = zbx_history_elastic_init(&history_ifaces[i], i, error);
 		else
-			ret = zbx_history_elastic_init(&history_ifaces[i], i, error);
+		    ret = zbx_history_sql_init(&history_ifaces[i], i, error);
 
 		if (FAIL == ret)
 			return FAIL;

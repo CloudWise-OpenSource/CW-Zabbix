@@ -30,6 +30,8 @@ typedef int (*zbx_history_add_values_func_t)(struct zbx_history_iface *hist, con
 typedef int (*zbx_history_get_values_func_t)(struct zbx_history_iface *hist, zbx_uint64_t itemid, int start,
 		int count, int end, zbx_vector_history_record_t *values);
 typedef int (*zbx_history_flush_func_t)(struct zbx_history_iface *hist);
+typedef int(*zbx_history_get_agg_values_func_t)(struct zbx_history_iface *hist, zbx_uint64_t itemid, int start, int end, int aggregates, char **buffer);
+typedef int(*zbx_history_preload_values_func_t)(struct zbx_history_iface *hist);
 
 struct zbx_history_iface
 {
@@ -40,7 +42,9 @@ struct zbx_history_iface
 	zbx_history_destroy_func_t	destroy;
 	zbx_history_add_values_func_t	add_values;
 	zbx_history_get_values_func_t	get_values;
+	zbx_history_get_agg_values_func_t agg_values;
 	zbx_history_flush_func_t	flush;
+	zbx_history_preload_values_func_t	preload_values;
 };
 
 /* SQL hist */
@@ -48,5 +52,8 @@ int	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, ch
 
 /* elastic hist */
 int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
+
+/* clickhouse hist */
+int	zbx_history_clickhouse_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
 
 #endif
