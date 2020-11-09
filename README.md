@@ -11,8 +11,8 @@ Zabbix在运行中产生的主要数据基本上可以分为history数据和tren
 在配置之前需要预先启动Clickhouse并导入表结构。启动Clickhouse时请注意配置中设置的http服务监听的端口号，下面的配置中会用到。
 
 表结构导入用到的sql语句：
+```
 
-'''
 CREATE DATABASE zabbix;
 
 CREATE TABLE zabbix.history ( day Date, 
@@ -31,9 +31,12 @@ CREATE TABLE zabbix.history_buffer (day Date,
  value Int64, 
  value_dbl Float64, 
  value_str String ) ENGINE = Buffer(zabbix, history, 8, 30, 60, 9000, 60000, 256000, 256000000) ;
-'''
 
-配置时的关键项目如下：
+```
+
+zabbix_server.conf配置时的关键项目如下：
+
+```
 
 1.HistoryStorageURL
 
@@ -54,3 +57,35 @@ CREATE TABLE zabbix.history_buffer (day Date,
 指示Clickhouse中所用的数据库名称：HistoryStorageDBName=zabbix
 
 配置好以上四项目后启动zabbix server即可。
+```
+
+zabbix_php.conf配置事项：
+```
+zabbix_php.conf文件中除了默认Mysql（$DB）需要配置外，添加$ZABBIX相关配置以及$HISTORY链接clickhouse相关配置：
+
+// Zabbix GUI configuration file.
+// Used for TLS connection.
+$DB['ENCRYPTION'] = false;
+$DB['KEY_FILE'] = '';
+$DB['CERT_FILE'] = '';
+$DB['CA_FILE'] = '';
+$DB['VERIFY_HOST'] = false;
+$DB['CIPHER_LIST'] = '';
+$DB['DOUBLE_IEEE754'] = true;
+
+$ZBX_SERVER = 'localhost';
+$ZBX_SERVER_PORT = '10051';
+$ZBX_SERVER_NAME = '';
+
+$IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
+
+$HISTORY['storagetype']='clickhouse';
+$HISTORY['url']='http://localhost:8123';
+$HISTORY['dbname']='zabbix';
+$HISTORY['types'] = ['uint', 'text', 'str', 'dbl'];
+$ClickHouseDisableNanoseconds=0; // 支持纳秒存储，不需要禁用
+$HISTORY['disable_trends']=1; // 在mysql的view中，不需要去clickhouse中取
+ClickHouseDisableNanoseconds=0;  // 日志记录中是否禁用纳秒配置
+$HISTORY['disable_trends']=1; // 是否禁用trends记录
+
+```
