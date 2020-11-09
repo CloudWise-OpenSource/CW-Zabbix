@@ -23,6 +23,7 @@ CREATE TABLE zabbix.history ( day Date,
  value_dbl Float64, 
  value_str String 
  ) ENGINE = MergeTree(day, (itemid, clock), 8192);
+
 CREATE TABLE zabbix.history_buffer (day Date, 
  itemid UInt64, 
  clock DateTime, 
