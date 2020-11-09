@@ -86,7 +86,8 @@ class CProblem extends CApiService {
 			'preservekeys'				=> false,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
-			'limit'						=> null
+			'limit'						=> null,
+            'fromserver'				=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
@@ -333,7 +334,7 @@ class CProblem extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($event = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $event['rowscount'];
