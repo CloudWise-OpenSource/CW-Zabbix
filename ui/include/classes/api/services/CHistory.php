@@ -366,7 +366,10 @@ class CHistory extends CApiService {
             ' FROM '.$sql_from.
             $sql_where.
             $sql_order;
-
+	    
+	if(!empty($sql_limit)){
+		$sql .= ' LIMIT ' . $sql_limit;
+	}
 
 //		var_dump($sql);
         $values = CClickHouseHelper::query($sql,1,array('itemid','clock','ns', 'value'));
