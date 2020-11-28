@@ -3,6 +3,7 @@
 !/src/modules/dummy/Makefile
 *.a
 *.o
+*.zip
 .cproject
 .deps
 .dirstamp
