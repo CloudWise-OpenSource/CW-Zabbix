@@ -67,6 +67,8 @@ class CClickHouseHelper
         // receive server response ...
         curl_setopt($oResource, CURLOPT_RETURNTRANSFER, true);
 
+        self::$oCurlResource[$sResourceUrl] = $oResource;
+
         return $oResource;
     }
 
