@@ -7,6 +7,83 @@
 class CClickHouseHelper
 {
 
+    private static $self = null;
+    private static $url = null;
+
+    private static $oCurlResource = array();
+
+    /**
+     *
+     * @return CClickHouseHelper
+     */
+    static private function instance()
+    {
+        if (self::$self == null) {
+            self::$self = new self;
+        }
+
+        return self::$self;
+    }
+
+    /**Å
+     * CClickHouseHelper constructor
+     */
+    public function __construct()
+    {
+        global $HISTORY;
+
+        if (isset($HISTORY['username']) && isset($HISTORY['password'])) {
+            $url = $HISTORY['url'] . '?user=' . $HISTORY['username'] . '&password=' . $HISTORY['password'];
+        } else {
+            $url = $HISTORY['url'];
+        }
+
+        self::$url = $url;
+    }
+
+    public function __destruct()
+    {
+        self::closeCurlResource();
+    }
+
+    /**
+     * @param $url
+     *
+     * @return mixed
+     */
+    private static function getCurlResource($url = null)
+    {
+        $sResourceUrl = !is_null($url) ? $url : self::$url;
+
+        if (in_array($sResourceUrl, self::$oCurlResource)) {
+            return self::$oCurlResource[$sResourceUrl];
+        }
+
+        $oResource = curl_init();
+
+        curl_setopt($oResource, CURLOPT_URL, $sResourceUrl);
+        curl_setopt($oResource, CURLOPT_FORBID_REUSE, false);
+
+        // receive server response ...
+        curl_setopt($oResource, CURLOPT_RETURNTRANSFER, true);
+
+        return $oResource;
+    }
+
+    /**
+     * @param $url
+     *
+     * @return bool
+     */
+    private static function closeCurlResource($url = null)
+    {
+        $oResource = self::getCurlResource($url);
+
+        curl_close($oResource);
+
+        return true;
+    }
+
     /**
      * Perform request(s) to Elasticsearch and parse the results.
      *
@@ -21,26 +98,14 @@ class CClickHouseHelper
      */
     public static function query($request, $is_table_result, $columns)
     {
+        CClickHouseHelper::instance();
 
-        global $HISTORY;
-//		error("$request ");
-        $ch = curl_init();
+        $ch = self::getCurlResource();
 
-        if (isset($HISTORY['username']) && isset($HISTORY['password'])) {
-            $url = $HISTORY['url'] . '?user=' . $HISTORY['username'] . '&password=' . $HISTORY['password'];
-        } else {
-            $url = $HISTORY['url'];
-        }
-
-        curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
 
-        // receive server response ...
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
         $server_output = curl_exec($ch);
-        curl_close($ch);
 
         return self::parseResult($server_output, $is_table_result, $columns);
 
