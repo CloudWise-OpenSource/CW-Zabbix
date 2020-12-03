@@ -47,6 +47,7 @@ if (!isset($allowed_content[$content_type])) {
 }
 
 require_once dirname(__FILE__).'/include/classes/core/APP.php';
+require_once dirname(__FILE__).'/include/classes/cache/YacShmop.php';
 
 header('Content-Type: application/json');
 $data = $http_request->body();
@@ -60,7 +61,25 @@ try {
 	API::setWrapper();
 
 	$jsonRpc = new CJsonRpc($apiClient, $data);
-	echo $jsonRpc->execute();
+
+    // 以分钟为刻度进行数据缓存
+    $shmKey = json_decode($data, true);
+    if ($shmKey) {
+        if (isset($shmKey['time_from']) && !empty($shmKey['time_from'])) {
+            $shmKey['time_from'] = strtotime(date('Y-m-d H:i', $shmKey['time_from']));
+        }
+
+        if (isset($shmKey['time_till']) && !empty($shmKey['time_till'])) {
+            $shmKey['time_till'] = strtotime(date('Y-m-d H:i', $shmKey['time_till']));
+        }
+        $shmKey     = md5(json_encode($shmKey));
+        $jsonResult = YacShmop::remember($shmKey, 60, function () use ($jsonRpc) {
+            return $jsonRpc->execute();
+        });
+        echo $jsonResult;
+    } else {
+        echo $jsonRpc->execute();
+    }
 }
 catch (Exception $e) {
 	// decode input json request to get request's id
