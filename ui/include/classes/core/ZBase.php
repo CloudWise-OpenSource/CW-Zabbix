@@ -322,7 +322,7 @@ class ZBase {
 	 * @throws Exception
 	 */
 	protected function setMaintenanceMode() {
-		require_once 'conf/maintenance.inc.php';
+		require_once '/etc/zabbix/web/maintenance.inc.php';
 
 		if (defined('ZBX_DENY_GUI_ACCESS')) {
 			if (!isset($ZBX_GUI_ACCESS_IP_RANGE) || !in_array(CWebUser::getIp(), $ZBX_GUI_ACCESS_IP_RANGE)) {
@@ -335,7 +335,7 @@ class ZBase {
 	 * Load zabbix config file.
 	 */
 	protected function loadConfigFile() {
-		$configFile = $this->getRootDir().CConfigFile::CONFIG_FILE_PATH;
+		$configFile = CConfigFile::CONFIG_FILE_PATH;
 		$config = new CConfigFile($configFile);
 		$this->config = $config->load();
 	}

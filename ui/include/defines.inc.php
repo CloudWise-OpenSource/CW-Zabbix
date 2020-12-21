@@ -79,7 +79,7 @@ define('ELASTICSEARCH_RESPONSE_AGGREGATION',	1);
 define('ELASTICSEARCH_RESPONSE_DOCUMENTS',		2);
 
 define('ZBX_FONTPATH',				realpath('assets/fonts')); // where to search for font (GD > 2.0.18)
-define('ZBX_GRAPH_FONT_NAME',		'DejaVuSans'); // font file name
+define('ZBX_GRAPH_FONT_NAME',		'graphfont'); // font file name
 define('ZBX_GRAPH_LEGEND_HEIGHT',	120); // when graph height is less then this value, some legend will not show up
 
 define('GRAPH_YAXIS_SIDE_DEFAULT', 0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
@@ -120,7 +120,7 @@ define('TRIGGERS_OPTION_RECENT_PROBLEM',	1);
 define('TRIGGERS_OPTION_ALL',				2);
 define('TRIGGERS_OPTION_IN_PROBLEM',		3);
 
-define('ZBX_FONT_NAME', 'DejaVuSans');
+define('ZBX_FONT_NAME', 'graphfont');
 
 define('ZBX_AUTH_INTERNAL',	0);
 define('ZBX_AUTH_LDAP',		1);
