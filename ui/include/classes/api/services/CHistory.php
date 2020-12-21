@@ -22,265 +22,250 @@
 /**
  * Class containing methods for operations with histories.
  */
-class CHistory extends CApiService
-{
+class CHistory extends CApiService {
 
     protected $tableName = 'history';
-    protected $tableAlias = 'h';
-    protected $sortColumns = ['itemid', 'clock'];
+	protected $tableAlias = 'h';
+	protected $sortColumns = ['itemid', 'clock'];
 
-    public function __construct()
-    {
-        // considering the quirky nature of the history API,
-        // the parent::__construct() method should not be called.
-    }
+	public function __construct() {
+		// considering the quirky nature of the history API,
+		// the parent::__construct() method should not be called.
+	}
 
-    /**
-     * Get history data.
-     *
-     * @param array  $options
-     * @param int    $options                                  ['history']                       History object type to return.
-     * @param array  $options                                  ['hostids']                       Return only history from the given hosts.
-     * @param array  $options                                  ['itemids']                       Return only history from the given items.
-     * @param int    $options                                  ['time_from']                     Return only values that have been received after or at
-     *                                                         the given time.
-     * @param int    $options                                  ['time_till']                     Return only values that have been received before or at
-     *                                                         the given time.
-     * @param array  $options                                  ['filter']                        Return only those results that exactly match the given
-     *                                                         filter.
-     * @param int    $options                                  ['filter']['itemid']
-     * @param int    $options                                  ['filter']['clock']
-     * @param mixed  $options                                  ['filter']['value']
-     * @param int    $options                                  ['filter']['ns']
-     * @param array  $options                                  ['search']                        Return results that match the given wildcard search
-     *                                                         (case-insensitive).
-     * @param string $options                                  ['search']['value']
-     * @param bool   $options                                  ['searchByAny']                   If set to true return results that match any of the
-     *                                                         criteria given in the filter or search parameter instead
-     *                                                         of all of them.
-     * @param bool   $options                                  ['startSearch']                   Return results that match the given wildcard search
-     *                                                         (case-insensitive).
-     * @param bool   $options                                  ['excludeSearch']                 Return results that do not match the criteria given in
-     *                                                         the search parameter.
-     * @param bool   $options                                  ['searchWildcardsEnabled']        If set to true enables the use of "*" as a wildcard
-     *                                                         character in the search parameter.
-     * @param array  $options                                  ['output']                        Object properties to be returned.
-     * @param bool   $options                                  ['countOutput']                   Return the number of records in the result instead of the
-     *                                                         actual data.
-     * @param array  $options                                  ['sortfield']                     Sort the result by the given properties. Refer to a
-     *                                                         specific API get method description for a list of
-     *                                                         properties that can be used for sorting. Macros are not
-     *                                                         expanded before sorting.
-     * @param array  $options                                  ['sortorder']                     Order of sorting. If an array is passed, each value will
-     *                                                         be matched to the corresponding property given in the
-     *                                                         sortfield parameter.
-     * @param int    $options                                  ['limit']                         Limit the number of records returned.
-     * @param bool   $options                                  ['editable']                      If set to true return only objects that the user has
-     *                                                         write permissions to.
-     *
-     * @throws Exception
-     * @return array|int    Data array or number of rows.
-     */
-    public function get($options = [])
-    {
-        $value_types        = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
-                               ITEM_VALUE_TYPE_TEXT,
-        ];
-        $common_value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64,
-                               ITEM_VALUE_TYPE_TEXT,
-        ];
+	/**
+	 * Get history data.
+	 *
+	 * @param array  $options
+	 * @param int    $options['history']                       History object type to return.
+	 * @param array  $options['hostids']                       Return only history from the given hosts.
+	 * @param array  $options['itemids']                       Return only history from the given items.
+	 * @param int    $options['time_from']                     Return only values that have been received after or at
+	 *                                                         the given time.
+	 * @param int    $options['time_till']                     Return only values that have been received before or at
+	 *                                                         the given time.
+	 * @param array  $options['filter']                        Return only those results that exactly match the given
+	 *                                                         filter.
+	 * @param int    $options['filter']['itemid']
+	 * @param int    $options['filter']['clock']
+	 * @param mixed  $options['filter']['value']
+	 * @param int    $options['filter']['ns']
+	 * @param array  $options['search']                        Return results that match the given wildcard search
+	 *                                                         (case-insensitive).
+	 * @param string $options['search']['value']
+	 * @param bool   $options['searchByAny']                   If set to true return results that match any of the
+	 *                                                         criteria given in the filter or search parameter instead
+	 *                                                         of all of them.
+	 * @param bool   $options['startSearch']                   Return results that match the given wildcard search
+	 *                                                         (case-insensitive).
+	 * @param bool   $options['excludeSearch']                 Return results that do not match the criteria given in
+	 *                                                         the search parameter.
+	 * @param bool   $options['searchWildcardsEnabled']        If set to true enables the use of "*" as a wildcard
+	 *                                                         character in the search parameter.
+	 * @param array  $options['output']                        Object properties to be returned.
+	 * @param bool   $options['countOutput']                   Return the number of records in the result instead of the
+	 *                                                         actual data.
+	 * @param array  $options['sortfield']                     Sort the result by the given properties. Refer to a
+	 *                                                         specific API get method description for a list of
+	 *                                                         properties that can be used for sorting. Macros are not
+	 *                                                         expanded before sorting.
+	 * @param array  $options['sortorder']                     Order of sorting. If an array is passed, each value will
+	 *                                                         be matched to the corresponding property given in the
+	 *                                                         sortfield parameter.
+	 * @param int    $options['limit']                         Limit the number of records returned.
+	 * @param bool   $options['editable']                      If set to true return only objects that the user has
+	 *                                                         write permissions to.
+	 *
+	 * @throws Exception
+	 * @return array|int    Data array or number of rows.
+	 */
+	public function get($options = []) {
+		$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+			ITEM_VALUE_TYPE_TEXT
+		];
+		$common_value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64,
+			ITEM_VALUE_TYPE_TEXT
+		];
 
-        $api_input_rules = ['type' => API_OBJECT, 'fields' => [
-            // filter
-            'history'                => ['type' => API_INT32, 'in' => implode(',', $value_types), 'default' => ITEM_VALUE_TYPE_UINT64],
-            'hostids'                => ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-            'itemids'                => ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-            'time_from'              => ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
-            'time_till'              => ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
-            'filter'                 => ['type' => API_MULTIPLE, 'default' => null, 'rules' => [
-                ['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
-                    'itemid'     => ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                    'clock'      => ['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                    'timestamp'  => ['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                    'source'     => ['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                    'severity'   => ['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                    'logeventid' => ['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                    'ns'         => ['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                ],
-                ],
-                ['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
-                    'itemid' => ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                    'clock'  => ['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                    'ns'     => ['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                ],
-                ],
-                ['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_UINT64])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
-                    'itemid' => ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                    'clock'  => ['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                    'ns'     => ['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                    'value'  => ['type' => API_UINTS64, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                ],
-                ],
-                ['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
-                    'itemid' => ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                    'clock'  => ['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                    'ns'     => ['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                    'value'  => ['type' => API_FLOATS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                ],
-                ],
-            ],
-            ],
-            'search'                 => ['type' => API_MULTIPLE, 'default' => null, 'rules' => [
-                ['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
-                    'source' => ['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                    'value'  => ['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                ],
-                ],
-                ['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
-                    'value' => ['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-                ],
-                ],
-                ['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => []],
-            ],
-            ],
-            'searchByAny'            => ['type' => API_BOOLEAN, 'default' => false],
-            'startSearch'            => ['type' => API_FLAG, 'default' => false],
-            'excludeSearch'          => ['type' => API_FLAG, 'default' => false],
-            'searchWildcardsEnabled' => ['type' => API_BOOLEAN, 'default' => false],
-            // output
-            'output'                 => ['type' => API_MULTIPLE, 'default' => API_OUTPUT_EXTEND, 'rules' => [
-                ['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'timestamp', 'source', 'severity', 'value', 'logeventid', 'ns'])],
-                ['if' => ['field' => 'history', 'in' => implode(',', $common_value_types)], 'type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'value', 'ns'])],
-            ],
-            ],
-            'countOutput'            => ['type' => API_FLAG, 'default' => false],
-            // sort and limit
-            'sortfield'              => ['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
-            'sortorder'              => ['type' => API_SORTORDER, 'default' => []],
-            'limit'                  => ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:' . ZBX_MAX_INT32, 'default' => null],
-            // flags
-            'editable'               => ['type' => API_BOOLEAN, 'default' => false],
-        ],
-        ];
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			// filter
+			'history' =>				['type' => API_INT32, 'in' => implode(',', $value_types), 'default' => ITEM_VALUE_TYPE_UINT64],
+			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'itemids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'time_from' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'time_till' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'filter' =>					['type' => API_MULTIPLE, 'default' => null, 'rules' => [
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
+					'itemid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'clock' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'timestamp' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'source' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'severity' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'logeventid' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'ns' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				]],
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
+					'itemid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'clock' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'ns' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				]],
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_UINT64])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
+					'itemid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'clock' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'ns' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'value' =>					['type' => API_UINTS64, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				]],
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
+					'itemid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'clock' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'ns' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'value' =>					['type' => API_FLOATS, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				]]
+			]],
+			'search' =>					['type' => API_MULTIPLE, 'default' => null, 'rules' => [
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
+					'source' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'value' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				]],
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
+					'value' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				]],
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => []]
+			]],
+			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>			['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
+			// output
+			'output' =>					['type' => API_MULTIPLE, 'default' => API_OUTPUT_EXTEND, 'rules' => [
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'timestamp', 'source', 'severity', 'value', 'logeventid', 'ns'])],
+											['if' => ['field' => 'history', 'in' => implode(',', $common_value_types)], 'type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'value', 'ns'])]
+			]],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
+			// sort and limit
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
+			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			// flags
+			'editable' =>				['type' => API_BOOLEAN, 'default' => false]
+		]];
 
-        if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-            self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-        }
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
-        if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || $options['hostids'] !== null) {
-            $items              = API::Item()->get([
-                'output'       => ['itemid'],
-                'itemids'      => $options['itemids'],
-                'hostids'      => $options['hostids'],
-                'editable'     => $options['editable'],
-                'webitems'     => true,
-                'preservekeys' => true,
-            ]);
-            $options['itemids'] = array_keys($items);
-        }
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || $options['hostids'] !== null) {
+			$items = API::Item()->get([
+				'output' => ['itemid'],
+				'itemids' => $options['itemids'],
+				'hostids' => $options['hostids'],
+				'editable' => $options['editable'],
+				'webitems' => true,
+				'preservekeys' => true
+			]);
+			$options['itemids'] = array_keys($items);
+		}
 
-        $this->tableName = CHistoryManager::getTableName($options['history']);
+		$this->tableName = CHistoryManager::getTableName($options['history']);
 
-        switch (CHistoryManager::getDataSourceType($options['history'])) {
-            case ZBX_HISTORY_SOURCE_ELASTIC:
-                return $this->getFromElasticsearch($options);
+		switch (CHistoryManager::getDataSourceType($options['history'])) {
+			case ZBX_HISTORY_SOURCE_ELASTIC:
+				return $this->getFromElasticsearch($options);
                 break;
             case ZBX_HISTORY_SOURCE_CLICKHOUSE:
                 return $this->getFromClickHouse($options);
                 break;
             default:
-                return $this->getFromSql($options);
-        }
-    }
+				return $this->getFromSql($options);
+		}
+	}
 
     /**
-     * SQL specific implementation of get.
-     *
-     * @see CHistory::get
-     */
-    private function getFromSql($options)
-    {
-        $result    = [];
-        $sql_parts = [
-            'select' => ['history' => 'h.itemid'],
-            'from'   => [
-                'history' => $this->tableName . ' h',
-            ],
-            'where'  => [],
-            'group'  => [],
-            'order'  => [],
-        ];
+	 * SQL specific implementation of get.
+	 *
+	 * @see CHistory::get
+	 */
+	private function getFromSql($options) {
+		$result = [];
+		$sql_parts = [
+			'select'	=> ['history' => 'h.itemid'],
+			'from'		=> [
+				'history' => $this->tableName.' h'
+			],
+			'where'		=> [],
+			'group'		=> [],
+			'order'		=> []
+		];
 
-        // itemids
-        if ($options['itemids'] !== null) {
-            $sql_parts['where']['itemid'] = dbConditionInt('h.itemid', $options['itemids']);
-        }
+		// itemids
+		if ($options['itemids'] !== null) {
+			$sql_parts['where']['itemid'] = dbConditionInt('h.itemid', $options['itemids']);
+		}
 
-        // time_from
-        if ($options['time_from'] !== null) {
-            $sql_parts['where']['clock_from'] = 'h.clock>=' . $options['time_from'];
-        }
+		// time_from
+		if ($options['time_from'] !== null) {
+			$sql_parts['where']['clock_from'] = 'h.clock>='.$options['time_from'];
+		}
 
-        // time_till
-        if ($options['time_till'] !== null) {
-            $sql_parts['where']['clock_till'] = 'h.clock<=' . $options['time_till'];
-        }
+		// time_till
+		if ($options['time_till'] !== null) {
+			$sql_parts['where']['clock_till'] = 'h.clock<='.$options['time_till'];
+		}
 
-        // filter
-        if ($options['filter'] !== null) {
-            $this->dbFilter($sql_parts['from']['history'], $options, $sql_parts);
-        }
+		// filter
+		if ($options['filter'] !== null) {
+			$this->dbFilter($sql_parts['from']['history'], $options, $sql_parts);
+		}
 
-        // search
-        if ($options['search'] !== null) {
-            zbx_db_search($sql_parts['from']['history'], $options, $sql_parts);
-        }
+		// search
+		if ($options['search'] !== null) {
+			zbx_db_search($sql_parts['from']['history'], $options, $sql_parts);
+		}
 
-        $sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-        $sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
+		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
 
-        $db_res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
+		$db_res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
-        while ($data = DBfetch($db_res)) {
-            if ($options['countOutput']) {
-                $result = $data['rowscount'];
-            } else {
-                $result[] = $data;
-            }
-        }
+		while ($data = DBfetch($db_res)) {
+			if ($options['countOutput']) {
+				$result = $data['rowscount'];
+			}
+			else {
+				$result[] = $data;
+			}
+		}
 
-        return $result;
-    }
+		return $result;
+	}
 
     /**
      * Clickhouse specific implementation of get.
      *
      * @see CHistory::get
      */
-    private function getFromClickHouse($options)
-    {
+    private function getFromClickHouse($options) {
         global $HISTORY, $ClickHouseDisableNanoseconds;
 
-        $result    = [];
+        $result = [];
         $sql_parts = [
-            'select' => ['history' => 'h.itemid'],
-            'from'   => [],
-            'where'  => [],
-            'group'  => [],
-            'order'  => [],
-            'limit'  => null,
+            'select'	=> ['history' => 'h.itemid'],
+            'from'		=> [],
+            'where'		=> [],
+            'group'		=> [],
+            'order'		=> [],
+            'limit'		=> null
         ];
 
 
-        $value_col = 'value';
+        $value_col='value';
 
-        if ($options['history'] == ITEM_VALUE_TYPE_STR ||
-            $options['history'] == ITEM_VALUE_TYPE_LOG ||
-            $options['history'] == ITEM_VALUE_TYPE_TEXT
-        ) {
-            $value_col = 'value_str';
-        } elseif ($options['history'] == ITEM_VALUE_TYPE_FLOAT) {
-            $value_col = 'value_dbl';
+        if ($options['history']==ITEM_VALUE_TYPE_STR ||
+            $options['history']==ITEM_VALUE_TYPE_LOG ||
+            $options['history']==ITEM_VALUE_TYPE_TEXT) {
+            $value_col='value_str';
+        } elseif ($options['history']==ITEM_VALUE_TYPE_FLOAT) {
+            $value_col='value_dbl';
         }
 
         switch ($options['history']) {
@@ -294,26 +279,26 @@ class CHistory extends CApiService
                 break;
         }
 
-        $table_name = $HISTORY['dbname'] . '.history';
+        $table_name = $HISTORY['dbname'].'.history';
 
-        $sql_parts['from']['history'] = $table_name . ' h';
+        $sql_parts['from']['history'] = $table_name.' h';
 
         // itemids
         if ($options['itemids'] !== null) {
-            $key                          = array_keys($options['itemids'])[0];
-            $sql_parts['where']['itemid'] = "h.itemid =" . $options['itemids'][$key];
+             $key = array_keys($options['itemids'])[0];
+             $sql_parts['where']['itemid'] = "h.itemid =". $options['itemids'][$key];
 
             //$sql_parts['where']['itemid'] = "h.itemid =". $options['itemids'][0];
         }
 
         // time_from
         if ($options['time_from'] !== null) {
-            $sql_parts['where']['clock_from'] = 'h.clock>=' . zbx_dbstr($options['time_from']);
+            $sql_parts['where']['clock_from'] = 'h.clock>='.zbx_dbstr($options['time_from']);
         }
 
         // time_till
         if ($options['time_till'] !== null) {
-            $sql_parts['where']['clock_till'] = 'h.clock<=' . zbx_dbstr($options['time_till']);
+            $sql_parts['where']['clock_till'] = 'h.clock<='.zbx_dbstr($options['time_till']);
         }
 
         // filter
@@ -335,7 +320,7 @@ class CHistory extends CApiService
         // countOutput
         if ($options['countOutput']) {
             $options['sortfield'] = '';
-            $sql_parts['select']  = ['count(DISTINCT h.hostid) as rowscount'];
+            $sql_parts['select'] = ['count(DISTINCT h.hostid) as rowscount'];
 
             // groupCount
             if ($options['groupCount']) {
@@ -354,13 +339,13 @@ class CHistory extends CApiService
         }
 
         $sql_parts['select'] = array_unique($sql_parts['select']);
-        $sql_parts['from']   = array_unique($sql_parts['from']);
-        $sql_parts['where']  = array_unique($sql_parts['where']);
-        $sql_parts['order']  = array_unique($sql_parts['order']);
+        $sql_parts['from'] = array_unique($sql_parts['from']);
+        $sql_parts['where'] = array_unique($sql_parts['where']);
+        $sql_parts['order'] = array_unique($sql_parts['order']);
 
         $sql_select = '';
-        $sql_from   = '';
-        $sql_order  = '';
+        $sql_from = '';
+        $sql_order = '';
 
         if ($sql_parts['select']) {
             $sql_select .= implode(',', $sql_parts['select']);
@@ -370,99 +355,97 @@ class CHistory extends CApiService
             $sql_from .= implode(',', $sql_parts['from']);
         }
 
-        $sql_where = $sql_parts['where'] ? ' WHERE ' . implode(' AND ', $sql_parts['where']) : '';
+        $sql_where = $sql_parts['where'] ? ' WHERE '.implode(' AND ', $sql_parts['where']) : '';
 
         if ($sql_parts['order']) {
-            $sql_order .= ' ORDER BY ' . implode(',', $sql_parts['order']);
+            $sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
         }
 
         $sql_limit = $sql_parts['limit'];
-        $sql       = "SELECT itemid, toInt32(clock)," . ($ClickHouseDisableNanoseconds == 1 ? "0 AS ns," : "ns,") . "$value_col" .
-            ' FROM ' . $sql_from .
-            $sql_where .
+        $sql = "SELECT itemid, toInt32(clock),". ($ClickHouseDisableNanoseconds == 1 ? "0 AS ns," : "ns,") ."$value_col".
+            ' FROM '.$sql_from.
+            $sql_where.
             $sql_order;
 
-        if (!empty($sql_limit)) {
-            $sql .= ' LIMIT ' . $sql_limit;
-        }
+		if(!empty($sql_limit)){
+			$sql .= ' LIMIT ' . $sql_limit;
+		}
 
-//		var_dump($sql);
-        $values = CClickHouseHelper::query($sql, 1, array('itemid', 'clock', 'ns', 'value'));
+        $values = CClickHouseHelper::query($sql,1,array('itemid','clock','ns', 'value'));
 
         return $values;
     }
 
-    /**
-     * Elasticsearch specific implementation of get.
-     *
-     * @see CHistory::get
-     */
-    private function getFromElasticsearch($options)
-    {
-        $query  = [];
-        $schema = DB::getSchema($this->tableName);
+	/**
+	 * Elasticsearch specific implementation of get.
+	 *
+	 * @see CHistory::get
+	 */
+	private function getFromElasticsearch($options) {
+		$query = [];
+		$schema = DB::getSchema($this->tableName);
 
-        // itemids
-        if ($options['itemids'] !== null) {
-            $query['query']['bool']['must'][] = [
-                'terms' => [
-                    'itemid' => $options['itemids'],
-                ],
-            ];
-        }
+		// itemids
+		if ($options['itemids'] !== null) {
+			$query['query']['bool']['must'][] = [
+				'terms' => [
+					'itemid' => $options['itemids']
+				]
+			];
+		}
 
-        // time_from
-        if ($options['time_from'] !== null) {
-            $query['query']['bool']['must'][] = [
-                'range' => [
-                    'clock' => [
-                        'gte' => $options['time_from'],
-                    ],
-                ],
-            ];
-        }
+		// time_from
+		if ($options['time_from'] !== null) {
+			$query['query']['bool']['must'][] = [
+				'range' => [
+					'clock' => [
+						'gte' => $options['time_from']
+					]
+				]
+			];
+		}
 
-        // time_till
-        if ($options['time_till'] !== null) {
-            $query['query']['bool']['must'][] = [
-                'range' => [
-                    'clock' => [
-                        'lte' => $options['time_till'],
-                    ],
-                ],
-            ];
-        }
+		// time_till
+		if ($options['time_till'] !== null) {
+			$query['query']['bool']['must'][] = [
+				'range' => [
+					'clock' => [
+						'lte' => $options['time_till']
+					]
+				]
+			];
+		}
 
-        // filter
-        if ($options['filter'] !== null) {
-            $query = CElasticsearchHelper::addFilter(DB::getSchema($this->tableName), $query, $options);
-        }
+		// filter
+		if ($options['filter'] !== null) {
+			$query = CElasticsearchHelper::addFilter(DB::getSchema($this->tableName), $query, $options);
+		}
 
-        // search
-        if ($options['search'] !== null) {
-            $query = CElasticsearchHelper::addSearch($schema, $query, $options);
-        }
+		// search
+		if ($options['search'] !== null) {
+			$query = CElasticsearchHelper::addSearch($schema, $query, $options);
+		}
 
-        // output
-        if ($options['countOutput'] === false && $options['output'] !== API_OUTPUT_EXTEND) {
-            $query['_source'] = $options['output'];
-        }
+		// output
+		if ($options['countOutput'] === false && $options['output'] !== API_OUTPUT_EXTEND) {
+			$query['_source'] = $options['output'];
+		}
 
-        // sorting
-        if ($options['sortfield']) {
-            $query = CElasticsearchHelper::addSort($query, $options);
-        }
+		// sorting
+		if ($options['sortfield']) {
+			$query = CElasticsearchHelper::addSort($query, $options);
+		}
 
-        // limit
-        if ($options['limit'] !== null) {
-            $query['size'] = $options['limit'];
-        }
+		// limit
+		if ($options['limit'] !== null) {
+			$query['size'] = $options['limit'];
+		}
 
-        $endpoints = CHistoryManager::getElasticsearchEndpoints($options['history']);
-        if ($endpoints) {
-            return CElasticsearchHelper::query('POST', reset($endpoints), $query);
-        }
+		$endpoints = CHistoryManager::getElasticsearchEndpoints($options['history']);
+		if ($endpoints) {
+			return CElasticsearchHelper::query('POST', reset($endpoints), $query);
+		}
 
-        return null;
-    }
+		return null;
+	}
 }

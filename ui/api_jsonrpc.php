@@ -62,24 +62,30 @@ try {
 
 	$jsonRpc = new CJsonRpc($apiClient, $data);
 
-    // 以分钟为刻度进行数据缓存
-    $shmKey = json_decode($data, true);
-    if ($shmKey) {
-        if (isset($shmKey['time_from']) && !empty($shmKey['time_from'])) {
-            $shmKey['time_from'] = strtotime(date('Y-m-d H:i', $shmKey['time_from']));
-        }
+    global $YAC_CACHE;
 
-        if (isset($shmKey['time_till']) && !empty($shmKey['time_till'])) {
-            $shmKey['time_till'] = strtotime(date('Y-m-d H:i', $shmKey['time_till']));
-        }
-        $shmKey     = md5(json_encode($shmKey));
-        $jsonResult = YacShmop::remember($shmKey, 60, function () use ($jsonRpc) {
-            return $jsonRpc->execute();
-        });
-        echo $jsonResult;
-    } else {
-        echo $jsonRpc->execute();
-    }
+	if(isset($YAC_CACHE['enable']) && $YAC_CACHE['enable'] && !is_null(YacShmop::getYacInstance())) {
+		// 以分钟为刻度进行数据缓存
+		$shmKey = json_decode($data, true);
+		if ($shmKey) {
+			if (isset($shmKey['time_from']) && !empty($shmKey['time_from'])) {
+				$shmKey['time_from'] = strtotime(date('Y-m-d H:i', $shmKey['time_from']));
+			}
+
+			if (isset($shmKey['time_till']) && !empty($shmKey['time_till'])) {
+				$shmKey['time_till'] = strtotime(date('Y-m-d H:i', $shmKey['time_till']));
+			}
+			$shmKey     = md5(json_encode($shmKey));
+			$jsonResult = YacShmop::remember($shmKey, 60, function () use ($jsonRpc) {
+				return $jsonRpc->execute();
+			});
+			echo $jsonResult;
+		} else {
+			echo $jsonRpc->execute();
+		}
+	} else {
+		echo $jsonRpc->execute();
+	}
 }
 catch (Exception $e) {
 	// decode input json request to get request's id

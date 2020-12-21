@@ -162,13 +162,17 @@ class CConfigFile {
 			$this->config['SSO'] = $SSO;
 		}
 
+		if (isset($YAC_CACHE)) {
+			$this->config['YAC_CACHE'] = $YAC_CACHE;
+		}
+
 		$this->makeGlobal();
 
 		return $this->config;
 	}
 
 	public function makeGlobal() {
-		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO;
+		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO, $YAC_CACHE;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -177,6 +181,7 @@ class CConfigFile {
 		$IMAGE_FORMAT_DEFAULT = $this->config['IMAGE_FORMAT_DEFAULT'];
 		$HISTORY = $this->config['HISTORY'];
 		$SSO = $this->config['SSO'];
+		$YAC_CACHE = $this->config['YAC_CACHE'];
 	}
 
 	public function save() {
@@ -239,6 +244,17 @@ $ZBX_SERVER_PORT		= \''.addcslashes($this->config['ZBX_SERVER_PORT'], "'\\").'\'
 $ZBX_SERVER_NAME		= \''.addcslashes($this->config['ZBX_SERVER_NAME'], "'\\").'\';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
+
+// Clickhouse connection
+// $HISTORY[\'storagetype\']=\'clickhouse\';
+// $HISTORY[\'url\']=\'http://localhost:8123\';
+// $HISTORY[\'dbname\']=\'zabbix\';
+// $HISTORY[\'types\'] = [\'uint\', \'text\', \'str\', \'dbl\'];
+// $ClickHouseDisableNanoseconds=0; // 支持纳秒存储，不需要禁用
+// $HISTORY[\'disable_trends\']=1; // 若在Clickhouse存储trends数据，请取消禁用设置为0
+
+// 1开启 0关闭 Zabbix-API开启yac缓存，需安装php yac扩展，数据将以分钟片段进行缓存，提供api高并发使用
+$YAC_CACHE[\'enable\']=0;
 
 // Uncomment this block only if you are using Elasticsearch.
 // Elasticsearch url (can be string if same url is used for all types).
