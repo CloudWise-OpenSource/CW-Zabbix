@@ -55,9 +55,7 @@
 
 ### 编译/安装
 
-Zabbix编译安装参考：**此版本支持数据源为mysql+clickhouse**，编译时请注意参数！官方文档供参考：
-
-[Zabbix源代码安装]: https://www.zabbix.com/documentation/5.0/zh/manual/installation/install
+Zabbix编译安装参考：**此版本支持数据源为mysql+clickhouse**，编译时请注意参数！官方文档供参考：[Zabbix源代码安装](https://www.zabbix.com/documentation/5.0/zh/manual/installation/install)
 
 ```shell
 # 这里仅展示安装zabbix-server-mysql，若安装zabbix-agent请参考上面链接
@@ -70,7 +68,7 @@ $ make install
 
 **如果使用软件包方式，会将Zabbix Web运行环境一并安装。但使用本仓库代码搭建Zabbix Web，需要手动安装运行环境。**  
 
-[Zabbix Web界面编译安装参考]: https://www.zabbix.com/documentation/5.0/zh/manual/installation/install#%E5%AE%89%E8%A3%85_zabbix_web_%E7%95%8C%E9%9D%A2
+[Zabbix Web界面编译安装参考](https://www.zabbix.com/documentation/5.0/zh/manual/installation/install#%E5%AE%89%E8%A3%85_zabbix_web_%E7%95%8C%E9%9D%A2)
 
 - 启动PHP 7.2、Mysql 5.7、Apache或Nginx
 
@@ -167,7 +165,7 @@ $ make install
 
 - 配置完成后，访问web页面，初始化zabbix，初始化请参考：
 
-  [Zabbix Web界面初始化]: https://www.zabbix.com/documentation/5.0/zh/manual/installation/frontend
+  [Zabbix Web界面初始化](https://www.zabbix.com/documentation/5.0/zh/manual/installation/frontend)
 
 ###  参数/配置
 
